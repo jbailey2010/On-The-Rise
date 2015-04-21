@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutionException;
 
 import org.htmlcleaner.XPatherException;
 
+import com.devingotaswitch.ontherise.TrendingAsyncTask.ParseNames;
+
 import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -46,18 +48,22 @@ import android.widget.Toast;
  */ 
 public class Trending extends Activity {
 	//Some globals, the dialog and the context
-	private Context cont;
+	private static Context cont;
 	private Button day;
 	private Button week;
 	private Button month;
 	private Button all;
-	private static OutBounceListView listview;
+	private static ListView listview;
 	private static boolean refreshed = false;
 	private int lastFilter;
 	private static SimpleAdapter mAdapter;
 	private static List<Map<String, String>> data;
 	private static Storage holder;
 	private final int color = 0XFF26a69a;
+	
+	// A year key for trending. Update to force syncing player names each year.
+	private final int YEAR_KEY = 2015;
+	
 	/**
 	 * Sets up the dialog to show up immediately
 	 */
@@ -66,8 +72,17 @@ public class Trending extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_trending);
 		cont = this;
+		holder = new Storage(cont);
     	SharedPreferences prefs = cont.getSharedPreferences("FFR", 0); 
-    	listview = (OutBounceListView)findViewById(R.id.listview_trending);
+    	listview = (ListView)findViewById(R.id.listview_trending);
+    	getActionBar().setDisplayShowTitleEnabled(false);
+    	// If it's the first ever app open or a new year, we want to refresh player names
+        if(ReadFromFile.readFirstOpen(cont) || ReadFromFile.isNewYear(cont, YEAR_KEY)) {
+        	helpDialog(true);
+        }
+        else if(!prefs.contains("Posts")) {
+    		Toast.makeText(cont, "Please select Filter Topics from the menu to see trending players", Toast.LENGTH_SHORT).show();
+    	}
 		initialLoad(prefs);
 	}
 
@@ -101,7 +116,7 @@ public class Trending extends Activity {
 				topicalTrending(holder);
 				return true;
 			case R.id.help:
-				helpDialog();
+				helpDialog(false);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -111,8 +126,9 @@ public class Trending extends Activity {
 	
 	/**
 	 * Handles the help dialog
+	 * @param doUpdateName 
 	 */
-	public void helpDialog() {
+	public void helpDialog(final boolean doUpdateNames) {
 		final Dialog dialog = new Dialog(cont, R.style.RoundCornersFull);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.help_trending);
@@ -126,6 +142,13 @@ public class Trending extends Activity {
 			@Override
 			public void onClick(View v) {
 				dialog.dismiss();
+				if(doUpdateNames){
+					WriteToFile.writeFirstOpen(cont);
+		        	WriteToFile.writeNewYear(cont, YEAR_KEY);
+					final TrendingAsyncTask stupid = new TrendingAsyncTask();
+					ParseNames task = stupid.new ParseNames((Activity)cont, true);
+				    task.execute(cont);
+				}
 			}
 	    });
 	}
@@ -138,9 +161,6 @@ public class Trending extends Activity {
 	public void initialLoad(SharedPreferences prefs) {
     	//Get the posts, if they're not set, fetch them. Otherwise, get from storage.
     	if(prefs.contains("Posts")) {
-    		Toast.makeText(cont, "Please select Filter Topics from the menu to see trending players", Toast.LENGTH_SHORT).show();
-    	}
-    	else {
     		ReadFromFile.fetchPostsLocal(cont, holder);
     	}
 		if(holder.playerNames.size() < 19) {
@@ -214,7 +234,7 @@ public class Trending extends Activity {
 	    }
 		else{
 			if(holder.posts.size() != 0){
-				Toast.makeText(cont, "The posts are saved, but not the players. Select a time frame above", Toast.LENGTH_SHORT).show();
+				Toast.makeText(cont, "The posts are saved, but not the players. Select a time frame below", Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
@@ -396,7 +416,13 @@ public class Trending extends Activity {
 			data = new ArrayList<Map<String, String>>();
 		}
 		holder.postedPlayers.clear();
-		ParseTrending.setUpLists(holder, filterSize, cont);
+		try {
+			ParseTrending.setUpLists(holder, filterSize, cont);
+		} catch (ParseException e) {
+			
+		} catch (IOException e) {
+			
+		}
 	}
 	
 	
@@ -411,6 +437,7 @@ public class Trending extends Activity {
 		month.setClickable(true);
 		all.setClickable(true);
 		int maxSize = ReadFromFile.readFilterQuantitySize((Context)cont);
+		System.out.println(maxSize);
 		PriorityQueue<PostedPlayer>finalList = new PriorityQueue<PostedPlayer>(300, new Comparator<PostedPlayer>()  {
 			@Override
 			public int compare(PostedPlayer a, PostedPlayer b) 
@@ -429,10 +456,12 @@ public class Trending extends Activity {
 		int total = holder.postedPlayers.size();
 		double fraction = (double)maxSize * 0.01;
 		double newSize = total * fraction;
+		System.out.println(newSize);
 		for(int i = 0; i < newSize; i++) {
 			finalList.add(holder.postedPlayers.poll());
 		}
 		holder.postedPlayers.clear();
+		System.out.println(finalList.size());
 		handleParsed(finalList, holder, cont);
 	}
 	
@@ -441,7 +470,7 @@ public class Trending extends Activity {
 	 * @param holder
 	 */
 	public void handleParsed(PriorityQueue<PostedPlayer> playersTrending, Storage holder, final Activity cont) {
-	    listview = (OutBounceListView) cont.findViewById(R.id.listview_trending);
+	    listview = (ListView) cont.findViewById(R.id.listview_trending);
 	    listview.setAdapter(null);
 	    data = new ArrayList<Map<String, String>>();
 	    List<String> trendingPlayers = new ArrayList<String>(350);
@@ -480,6 +509,7 @@ public class Trending extends Activity {
 	    		sb.append("\n" + sub.toString());
 	    	}
 	    	datum.put("count", sb.toString());
+	    	data.add(datum);
 	    }
 	    if(data.size() == 0) {
 	    	Map<String, String> datum = new HashMap<String, String>(2);
@@ -536,7 +566,7 @@ public class Trending extends Activity {
     	else
     	{
 	    	datum.put("name", "The posts are fetched\n");
-	    	datum.put("count", "Select a timeframe from above");
+	    	datum.put("count", "Select a timeframe from below");
     	}
     	data.add(datum);
     	mAdapter = new SimpleAdapter(act, data, 
@@ -549,5 +579,10 @@ public class Trending extends Activity {
 
 	public static void setHolder(Storage result) {
 		holder = result;
+	}
+
+	public static void finishInitialConfig() {
+		Toast.makeText(cont, "Please select Filter Topics from the menu to see trending players", Toast.LENGTH_SHORT).show();
+		ReadFromFile.fetchNamesBackEnd(holder, cont);
 	}
 }

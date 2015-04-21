@@ -41,5 +41,15 @@
         android:layout_marginTop="22dp"
         android:text="If you see someone in the output list that you aren't interested in, slide to the side, and he will disappear. Note that this is temporary."
         android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView3"
+        android:layout_marginTop="22dp"
+        android:text="The first time you open the app, a one time download will be done. This shouldn't take more than a few seconds."
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>

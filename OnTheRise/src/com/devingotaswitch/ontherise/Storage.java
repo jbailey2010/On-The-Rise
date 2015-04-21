@@ -28,6 +28,7 @@ public class Storage
 	public List<Post> posts;
 	public HashSet<String> parsedPlayers;
 	public PriorityQueue<PostedPlayer> postedPlayers;
+	// Update this as the regular season changes
 	public final boolean isRegularSeason = false;
 	/**
 	 * This sets up the priority queue and it's subsequent comparator.

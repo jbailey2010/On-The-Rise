@@ -60,15 +60,15 @@
         android:id="@+id/trending_list_base"
         android:background="#444444" >
 
-        <com.devingotaswitch.ontherise.OutBounceListView
+        <ListView
             android:id="@+id/listview_trending"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:background="#999999"
+            android:background="#ffffff"
             android:clickable="true"
-            android:divider="#999999"
+            android:divider="@drawable/list_divider"
             android:dividerHeight="1dp" >
-        </com.devingotaswitch.ontherise.OutBounceListView>
+        </ListView>
     </RelativeLayout>
 
 </RelativeLayout>
