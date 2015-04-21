@@ -437,7 +437,6 @@ public class Trending extends Activity {
 		month.setClickable(true);
 		all.setClickable(true);
 		int maxSize = ReadFromFile.readFilterQuantitySize((Context)cont);
-		System.out.println(maxSize);
 		PriorityQueue<PostedPlayer>finalList = new PriorityQueue<PostedPlayer>(300, new Comparator<PostedPlayer>()  {
 			@Override
 			public int compare(PostedPlayer a, PostedPlayer b) 
@@ -456,12 +455,10 @@ public class Trending extends Activity {
 		int total = holder.postedPlayers.size();
 		double fraction = (double)maxSize * 0.01;
 		double newSize = total * fraction;
-		System.out.println(newSize);
 		for(int i = 0; i < newSize; i++) {
 			finalList.add(holder.postedPlayers.poll());
 		}
 		holder.postedPlayers.clear();
-		System.out.println(finalList.size());
 		handleParsed(finalList, holder, cont);
 	}
 	
@@ -510,6 +507,7 @@ public class Trending extends Activity {
 	    	}
 	    	datum.put("count", sb.toString());
 	    	data.add(datum);
+	    	trendingPlayers.add(elem.name + ": mentioned " + elem.count + " times//" + sb.toString());
 	    }
 	    if(data.size() == 0) {
 	    	Map<String, String> datum = new HashMap<String, String>(2);

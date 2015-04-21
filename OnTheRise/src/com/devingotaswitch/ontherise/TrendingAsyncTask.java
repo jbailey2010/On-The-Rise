@@ -151,10 +151,6 @@ public class TrendingAsyncTask {
 		   super.onPostExecute(result);
 		   pdia.dismiss();
 		   boolean flag = false;
-		   if(holder.posts.size() > 1)
-			{
-				WriteToFile.writePosts(holder, act);
-			}
 		   if(holder.posts.size() == 0)
 		   {
 			   SharedPreferences.Editor editor = act.getSharedPreferences("FFR", 0).edit();
