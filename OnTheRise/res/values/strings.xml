@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="app_name" tools:ignore="MissingTranslation,MissingTranslation,MissingTranslation">Fantasy Football Frontpage</string>
+    <string name="app_name" tools:ignore="MissingTranslation,MissingTranslation,MissingTranslation">On The Rise</string>
     <string name="hello_world" tools:ignore="MissingTranslation,MissingTranslation">Hello world!</string>
     <string name="action_settings" tools:ignore="MissingTranslation">Settings</string>
 
