@@ -221,7 +221,7 @@ public class TrendingAsyncTask {
 				 		//Rookie rankings
 			 			//ParseTrending.getPosts(holder, "http://forums.rotoworld.com/index.php?showtopic=331665&st=");
 			 			//Draft thread
-			 			//ParseTrending.getPosts(holder, "http://forums.rotoworld.com/index.php?showtopic=440599&st=");
+			 			ParseTrending.getPosts(holder, "http://forums.rotoworld.com/index.php?showtopic=518365&st=");
 			 		}
 			 		if(dontWant)
 			 		{

@@ -61,8 +61,10 @@ public class Trending extends Activity {
 	private static Storage holder;
 	private final int color = 0XFF26a69a;
 	
-	// A year key for trending. Update to force syncing player names each year.
-	private final int YEAR_KEY = 2015;
+	// A (initially by year) key for trending. Update to force syncing player names as needed.
+	// 2015: Initial push
+	// 2016: Post 2015 draft push to get rookie names
+	private final int VERSION_KEY = 2016;
 	
 	/**
 	 * Sets up the dialog to show up immediately
@@ -77,7 +79,7 @@ public class Trending extends Activity {
     	listview = (ListView)findViewById(R.id.listview_trending);
     	getActionBar().setDisplayShowTitleEnabled(false);
     	// If it's the first ever app open or a new year, we want to refresh player names
-        if(ReadFromFile.readFirstOpen(cont) || ReadFromFile.isNewYear(cont, YEAR_KEY)) {
+        if(ReadFromFile.readFirstOpen(cont) || ReadFromFile.isNewVersion(cont, VERSION_KEY)) {
         	helpDialog(true);
         }
         else if(!prefs.contains("Posts")) {
@@ -144,7 +146,7 @@ public class Trending extends Activity {
 				dialog.dismiss();
 				if(doUpdateNames){
 					WriteToFile.writeFirstOpen(cont);
-		        	WriteToFile.writeNewYear(cont, YEAR_KEY);
+		        	WriteToFile.writeNewYear(cont, VERSION_KEY);
 					final TrendingAsyncTask stupid = new TrendingAsyncTask();
 					ParseNames task = stupid.new ParseNames((Activity)cont, true);
 				    task.execute(cont);

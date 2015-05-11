@@ -78,7 +78,7 @@ public class ReadFromFile {
 		return prefs.getBoolean("First Open", true);
 	}
 
-	public static boolean isNewYear(Context cont, int yearKey) {
+	public static boolean isNewVersion(Context cont, int yearKey) {
 		SharedPreferences prefs = cont.getSharedPreferences("FFR", 0);
 		return prefs.getInt("Year Key", 2000) < yearKey;
 	}
